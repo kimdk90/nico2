@@ -1,6 +1,7 @@
 import http from "http";
 import express from "express";
 import WebSocket from "ws";
+import SocketIo from "socket.io";
 
 const app = express();
 
@@ -16,21 +17,49 @@ const handleListen = () => console.log(`listenign on http://localhost:3000`);
 //app.listen(3000, handleListen);
 
 //http,ws 같이 실행하기
-const server = http.createServer(app); //http
+const httpServer = http.createServer(app); //http
+//ws
+//const wss = new WebSocket.Server({server}); //ws
+//socket Io
+const wsServer = SocketIo(httpServer);
 
-const wss = new WebSocket.Server({server}); //ws
 
-wss.on("connection", (socket) => {
-    console.log("Connected to Browser");
-    socket.on("close", () => {
-        console.log("Disconnected from the Browser X");
-    });
+// //소켓구분
+// const sockets = [];
 
-    socket.on("message", (message) => {
-        console.log(message);
-    });
-    
-    socket.send("hello!!!");
-});
+// //ws 연결되면
+// wss.on("connection", (socket) => {
+//     sockets.push(socket);
+//     socket["nickname"] = "Anon";
+
+//     console.log("Connected to Browser");
+//     socket.on("close", () => {
+//         console.log("Disconnected from the Browser X");
+//     });
+
+//     socket.on("message", (msg) => {
+//         const message = JSON.parse(msg);
+
+//         //switch
+//         switch(message.type) {
+//             case "new_message" :   
+//                 sockets.forEach(aSocket => aSocket.send(`${socket.nickname} : ${message.payload}`));
+//             case "nickname" :
+//                 socket["nickname"] = message.payload;
+//         }
+
+//         //if 
+//         // if(parsed.type === "new_message") {
+//         //     sockets.forEach(aSocket => aSocket.send(`${socket.nickname} : ${message.payload}`));
+//         // } else if(parsed.type === "nickname") {
+//         //     socket["nickname"] = message.payload;
+//         // }
+        
+
+//         // //ws 버젼때문에 뒤에 tostring 붙여 줍니다.
+//         // console.log(message.toString()); 
+//         // socket.send(message.toString());
+//     }); 
+// });
 
 server.listen(3000, handleListen);

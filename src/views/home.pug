@@ -8,9 +8,16 @@ html(lang="en")
         link(rel='stylesheet' href="https://unpkg.com/mvp.css")
     body 
         header 
-            h1 It works!
+            h1 Noom
         main
-            h2 Wellcome to Noom
+            
+            form#nick
+                input(type="text", placeholder="choose a nickname", required)
+                button save
+            ul 
+            form#message
+                input(type="text", placeholder="write a msg", required)
+                button send
         //404에러 뜸
         //- ㄹㅇ 뜸 app.use("/public", express.static(__dirname + "/public")); 다시 쓰니깐 됨 뭐지?
         script(src="/public/js/app.js")
