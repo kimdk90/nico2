@@ -23,7 +23,21 @@ const httpServer = http.createServer(app); //http
 //socket Io
 const wsServer = SocketIo(httpServer);
 
+wsServer.on("connection", (socket) => {
+    socket.on("enter_room", (roomName, done) => {
+        console.log(socket.rooms);
 
+        socket.join(roomName); //room 만들기
+
+        console.log(socket.rooms);
+        setTimeout(() => {
+            done();
+        }, 10000);
+    });
+}); 
+
+
+//ws 사용시
 // //소켓구분
 // const sockets = [];
 
@@ -62,4 +76,6 @@ const wsServer = SocketIo(httpServer);
 //     }); 
 // });
 
-server.listen(3000, handleListen);
+//server.listen(3000, handleListen);
+
+httpServer.listen(3000, handleListen);
