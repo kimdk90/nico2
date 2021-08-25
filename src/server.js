@@ -24,16 +24,30 @@ const httpServer = http.createServer(app); //http
 const wsServer = SocketIo(httpServer);
 
 wsServer.on("connection", (socket) => {
-    socket.on("enter_room", (roomName, done) => {
-        console.log(socket.rooms);
-
-        socket.join(roomName); //room 만들기
-
-        console.log(socket.rooms);
-        setTimeout(() => {
-            done();
-        }, 10000);
+    //wsServer.socketsJoin("announcement");
+    socket["nickname"] = "Anne";
+    socket.onAny((e) => {
+        console.log(`socket Event:${e}`);
     });
+    socket.on("enter_room", (roomName, done) => {
+        
+        socket.join(roomName); //room 만들기
+        done();
+        socket.to(roomName).emit("Welcome", socket.nickname);
+
+        // setTimeout(() => {
+        //     done("hello from the background");
+        // }, 10000);
+    });
+    socket.on("disconnecting", () => {
+        socket.rooms.forEach((room) => socket.to(room).emit("bye", socket.nickname)); 
+    })
+
+    socket.on("new_message", (msg, room, done) => {
+        socket.to(room).emit("new_message", `${socket.nickname}: ${msg}`);
+        done();
+    });
+    socket.on("nickname", (nickname) => (socket["nickname"] =nickname));
 }); 
 
 

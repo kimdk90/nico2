@@ -1,25 +1,80 @@
 //socket io
 const socket = io();
 
+//룸
 const welcome = document.getElementById("welcome");
 const form = document.querySelector("form");
+
+//message
+const room = document.getElementById("room");
+
+const msgForm = room.querySelector("#msg");
+const nameForm = room.querySelector("#name");
+
+room.hidden = true;
+
+//참가자 확인
+let roomName;
+
+function addMessage(message) {
+    const ul = room.querySelector("ul");
+    const li = document.createElement("li");
+    li.innerText = message;
+    ul.appendChild(li);
+}
 
 function backdendDone() {
     console.log("backend done!");
 }
 
+function handleMessageSubmit(e) {
+    e.preventDefault();
+    const input = room.querySelector("#msg input");
+    const value = input.value;
+    socket.emit("new_message", input.value, roomName, () => {
+        addMessage(`You : ${value}`);
+    });
+    input.value = '';
+};
+
+function handleNicknameSubmit(e) {
+    e.preventDefault();
+    const input = room.querySelector("#name input");
+    const value = input.value;
+    socket.emit("nickname", value);
+    nameForm.hidden = true;
+};
+
+function showRoom() {
+    welcome.hidden = true;
+    room.hidden = false;
+    const h3 = room.querySelector("h3");
+    h3.innerText = `Room ${roomName}`;
+    msgForm.addEventListener("submit", handleMessageSubmit);
+    nameForm.addEventListener("submit", handleNicknameSubmit);
+}
+
 function handleRoomSubmit(e) {
     e.preventDefault();
     const input = form.querySelector("input");
-
+    
     //emit의 마지막 arg는 fn
-    socket.emit("enter_room", input.value, backdendDone);
+    socket.emit("enter_room", input.value, showRoom);
+    roomName = input.value;
     input.value ="";
 } 
 
 form.addEventListener("submit", handleRoomSubmit);
 
+socket.on("Welcome", (user) => {
+    addMessage(`${user} arrived!`);
+});
 
+socket.on("bye", (left) => {
+    addMessage(`${left} left ㅠㅠ`);
+});
+
+socket.on("new_message", addMessage);
 
 
 //ws
